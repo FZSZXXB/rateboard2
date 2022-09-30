@@ -26,15 +26,21 @@ else { this.title = "新建运动会"; }
       </div>
     </div>
    
-    <div class="field">
-      <label>公告</label>
-      <textarea id='tmp' style="display: none;"><%= season.content %></textarea>
-      <link rel="stylesheet" href="https://cdn.fzsz.net/css/markdown-palettes.css">
-      <script src="https://cdn.fzsz.net/js/markdown-palettes.min.js"></script>
-      <div id="editor-container" style="height: 700px;">
-        <div id="editor"></div>
+    <div class="ui segment">
+		<div class="ui two column very relaxed grid">
+			<div class="column">
+				<label>公告</label>
+				<textarea style="min-height: 500px; font-size: 17px;" cols="8" type="text" id="md_content"><%= season.content %></textarea>
+			</div>
+			<div class="column">
+        <h4 class="ui top attached block header"><i class="fad fa-info-circle status pending"></i>公告</h4>
+        <div class="ui bottom attached segment" id="md_preview">
+        </div>
       </div>
-    </div>
+		</div>
+		<div class="ui vertical divider"><span class="req">预览</span></div>
+		
+	</div>
   </div>
   <br>
 </div>
@@ -48,9 +54,11 @@ else { this.title = "新建运动会"; }
 
 <script>
 $(document).ready(function () {
-  markdownEditor = new MarkdownPalettes("#editor");
-  markdownEditor.content = $('#tmp').val();
+  $('#md_preview').html(marked.parse($('#md_content').val()));
 })
+$('#md_content').bind('input propertychange change', function () {
+	$('#md_preview').html(marked.parse($(this).val()));
+});
 function show_error(title, error) {
   swal({
     title: title + "失败。",
@@ -75,7 +83,7 @@ $('#submit_season').click(function () {
       'title': $('#title').val(),
       'start_time': $('#start_time').val(),
       'end_time': $('#end_time').val(),
-      'content': markdownEditor.content
+      'content': $('#md_content').val()
     },
     async: true,
     success: function (data) {
