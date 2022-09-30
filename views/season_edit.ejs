@@ -1,0 +1,116 @@
+<%
+if (!pjax) {
+if (season.title) { this.title = season.title; }
+else { this.title = "新建运动会"; }
+%>
+
+<%- include('head') %>
+<% } %>
+
+<textarea id="titleVal" style="display:none;"><%= season.title ? season.title : '新建运动会' %></textarea>
+
+<div class="ui segment">
+  <div class="ui form">
+    <div class="field">
+      <label for="title">标题</label>
+      <input type="text" id="title" name="title" value="<%= season.title %>">
+    </div>
+    <div class="fields">
+      <div class="inline field">
+        <label for="title">开始时间</label>
+        <input type="text" id="start_time" name="start_time" value="<%= season.start_time %>">
+      </div>
+      <div class="inline field">
+        <label for="title">结束时间</label>
+        <input type="text" id="end_time" name="end_time" value="<%= season.end_time %>">
+      </div>
+    </div>
+   
+    <div class="field">
+      <label>公告</label>
+      <textarea id='tmp' style="display: none;"><%= season.content %></textarea>
+      <link rel="stylesheet" href="https://cdn.fzsz.net/css/markdown-palettes.css">
+      <script src="https://cdn.fzsz.net/js/markdown-palettes.min.js"></script>
+      <div id="editor-container" style="height: 700px;">
+        <div id="editor"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+</div>
+<div style="text-align: center; ">
+  <button id="submit_season" class="ui labeled submit icon button">
+    <i class="icon edit"></i> 发布运动会
+  </button>
+
+</div>
+</div>
+
+<script>
+$(document).ready(function () {
+  markdownEditor = new MarkdownPalettes("#editor");
+  markdownEditor.content = $('#tmp').val();
+})
+function show_error(title, error) {
+  swal({
+    title: title + "失败。",
+    icon: "error",
+    text: error
+  });
+}
+function success(title, id) {
+  swal({
+    title: title + "成功！",
+    icon: "success"
+  }).then(function () {
+    window.location.href = location.protocol + '//' + location.host + '/sport/season/' + id;
+  });
+}
+$('#submit_season').click(function () {
+  let id = getSeasonId();
+  $.ajax({
+    url: `/sport/season/${id}/edit`,
+    type: 'POST',
+    data: {
+      'title': $('#title').val(),
+      'start_time': $('#start_time').val(),
+      'end_time': $('#end_time').val(),
+      'content': markdownEditor.content
+    },
+    async: true,
+    success: function (data) {
+      error_code = data.error_code;
+      switch (error_code) {
+        case 3001:
+          show_error("运动会发布", "请登录后继续。");
+          break;
+        case 3002:
+          show_error("运动会发布", "标题名不能为空。");
+          break;
+        case 1:
+          success("运动会发布", data.season_id);
+          return;
+        default:
+          show_error("运动会发布", data.detail);
+          break;
+      }
+    },
+    error: function (xhr, textStatus, errorThrown) {
+      show_error("运动会发布", "您与服务器断开连接。");
+      /*错误信息处理*/
+      console.log("进入error---");
+      console.log("状态码：" + xhr.status);
+      console.log("状态:" + xhr.readyState);//当前状态,0-未初始化，1-正在载入，2-已经载入，3-数据进行交互，4-完成。
+      console.log("错误信息:" + xhr.statusText);
+      console.log("返回响应信息：" + xhr.responseText);//这里是详细的信息
+      console.log("请求状态：" + textStatus);
+      console.log(errorThrown);
+      console.log("请求失败");
+    }
+  });
+})
+</script>
+
+<% if (!pjax) { %>
+<%- include('foot') %>
+<% } %>

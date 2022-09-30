@@ -1,0 +1,36 @@
+<% if (!pjax) { %>
+<% this.title = '首页' %>
+<%- include("head") %>
+<% } %>
+
+<textarea id="titleVal" style="display:none;">首页</textarea>
+<% if (user) { %>
+<div style="text-align: right;">
+	<a class="ui pink labeled icon button" href="<%= web_util.makeUrl(['season', 0, 'edit']) %>">
+		<i class="icon fas fa-plus"></i>新建运动会
+	</a>
+</div>
+<% } %>
+<% if (seasons.length) { for (let a of seasons) { %>
+<div class="ui segment">
+  <div class="post-head"><a class="post-title" href="<%= web_util.makeUrl(['season', a.id]) %>"><h2 class="post-title-link"><%= a.title %></h2></a></div>
+
+<p class="description">
+  <% if (a.content) { %><%- a.content %>
+  <% } else { %>暂无描述~<% } %>
+</p>
+<div style="text-align: right;"><a class="req" href="<%= web_util.makeUrl(['season', a.id]) %>">查看更多 ></a></div>
+
+</div>
+<% }} else { %>
+<div class="ui placeholder segment">
+  <div class="ui icon header">
+    <i class="fad fa-calendar" style="margin-bottom: 20px; "></i>
+    暂无运动会，敬请期待~
+  </div>
+</div>
+<% } %>
+
+<% if (!pjax) { %>
+<%- include("foot") %>
+<% } %>

@@ -1,0 +1,240 @@
+</div>
+<div class="ui vertical footer segment" style="margin-top: 15px; ">
+	<div class="ui center aligned container">
+		<span style="color: #999999;">
+			成绩表2.0 暂时还没有开源。
+		<span style="color: #999999;">
+			<span>内部测试版</span>。</span>
+		<br>
+		<span style="color: #999999;">
+			2022 ❤️ 福三中学生小助手 | 福州三中信息技术部
+		</span>
+		<br>
+		<span style="color: #999999;">
+			
+			<a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=35010202000574"
+			style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img
+					src="https://cdn.fzsz.net/img/beian.png" style="float:left;"></a> <a target="_blank"
+			href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=35010202000574"
+			style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">闽公网安备 35010202000574号</a>
+	&nbsp;<a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备07502183号-1</a>
+		</span>
+	</div>
+</div>
+</div>
+<script type="text/javascript">
+function getSeasonId() {
+	let str = window.location.pathname.split('/').filter(x => x);
+	if (str.length > 2)
+		return parseInt(window.location.pathname.split('/').filter(x => x)[2]);
+	else
+		return 0;
+}
+function getContestId() {
+	let str = window.location.pathname.split('/').filter(x => x);
+	if (str.length > 4)
+		return parseInt(window.location.pathname.split('/').filter(x => x)[4]);
+	else
+		return 0;
+}
+
+function getDetailCla(id) {
+	$('#infoModal').modal('show');
+	let d = JSON.parse(localStorage.getItem(`season${getSeasonId()}_search`));
+	$('#infoTitle').text(d.classes[id].keyword2 + '的获奖情况');
+	$('#infoContent').empty();
+	let str = d.classes[id].contests.split('|');
+	for (let a of str) {
+		let cid = a.split('#')[0], rank = a.split('#')[1];
+		fetch(`/sport/queryContest/${cid}`)
+			.then(response => response.json())
+			.then(data => {
+				$('#infoContent').append(`<p>${getGradeName(data.grade) + getTypeName(data.type) + data.title}第 ${rank} 名。</p>`);
+			})
+	}
+}
+function getDetailStu(id) {
+	$('#infoModal').modal('show');
+	let d = JSON.parse(localStorage.getItem(`season${getSeasonId()}_search`));
+	$('#infoTitle').text(d.athletes[id].name_class_season.split('_')[0].split('|')[0] + '的获奖情况');
+	$('#infoContent').empty();
+	let str = d.athletes[id].contests.split('|');
+	for (let a of str) {
+		let cid = a.split('#')[0], rank = a.split('#')[1];
+		fetch(`/sport/queryContest/${cid}`)
+			.then(response => response.json())
+			.then(data => {
+				$('#infoContent').append(`<p>${getGradeName(data.grade) + getTypeName(data.type) + data.title}第 ${rank} 名。</p>`);
+			})
+	}
+}
+function copyText(text) {
+	var $textarea = $('<textarea>');
+	$textarea.text(text);
+	$('body').append($textarea);
+	$textarea.select();
+	document.execCommand('copy');
+	$textarea.remove();
+	swal({
+		title: "复制",
+		icon: "success",
+		text: "内容已复制到剪贴板。"
+	});
+}
+$('body').on('click', '*[data-click-copy]', function () {
+	var text = $(this).attr('data-click-copy');
+	copyText(text);
+});
+$(function () {
+	$('.ui.dropdown:not(.simple)').dropdown();
+});
+$(function () {
+	var $g = $(".js_gallery_evaluate");
+	if ($g.length > 0) {
+		$g.fancybox({
+			padding: 0,
+			helpers: {
+				overlay: {
+					locked: false
+				} 
+			} 
+		});
+	}
+});
+$(".mobile.start").on('click', function () {
+	$('.ui.mobile.sidebar').sidebar('toggle');
+})
+
+</script>
+<script src="https://cdn.fzsz.net/js/jquery.pjax.js"></script>
+<script>
+$(document).pjax('a:not(.noPjax)', {
+	container: '#mainUiContainer', //内容替换的容器
+	show: 'fade',  //展现的动画，支持默认和fade, 可以自定义动画方式，这里为自定义的function即可。
+	cache: false,  //是否使用缓存
+	storage: false,  //是否使用本地存储
+	titleSuffix: '', //标题后缀
+})
+function fetchContest() {
+	$('#season_content').empty();
+	$('#contests').empty();
+	fetch(`/sport/season/${getSeasonId()}?dataOnly=true`)
+		.then(response => response.json())
+		.then(data => {
+			$('#season_content').html(marked.parse(data.content));
+			localStorage.setItem(`season${getSeasonId()}_content`, data.content);
+			localStorage.setItem(`season${getSeasonId()}_contests`, JSON.stringify(data.contests));
+			let contests = data.contests;
+			let label = true;
+			Array.prototype.forEach.call(contests, (contest, index) => {
+				label = false;
+				$('#contests').append(`<tr>
+<td><span class="p-${getGradeColor(contest.grade)}">${getGradeName(contest.grade)}</span>
+<span class="p-${getTypeColor(contest.type)}">${getTypeName(contest.type)}</span>${contest.title}</td>
+<td>${contest.time}</td>
+<td><button class="ui pink button" onclick="getRanking(${contest.rankId}, ${index})">点击查看</button></td>
+<% if (user) { %><td><a class="ui purple button" href="/sport/season/${contest.season}/contest/${contest.id}/edit">编辑</a></td><% } %>
+</tr>`)
+			});
+
+			if (label) {
+				$('#no_contest').show();
+			} else {
+				$('#no_contest').hide();
+			}
+		});
+}
+function fetchSearch() {
+	
+	fetch(`/sport/season/${getSeasonId()}/search?dataOnly=true`)
+		.then(response => response.json())
+		.then(data => {
+			data.athletes
+				.map(x => {
+					let name_class = x.name_class_season.split('_')[0];
+					let _class = transClass(name_class.split('|')[1]);
+					let name = name_class.split('|')[0];
+					x.keyword1 = name + ' 来自 ' + _class, x.keyword2 = x.abbr
+				});
+			data.classes
+				.map(x => { x.keyword1 = x.id_season.split('_')[0], x.keyword2 = transClass(x.keyword1) });
+			localStorage.setItem(`season${getSeasonId()}_search`, JSON.stringify(data));
+			$('#searchInput').bind('input propertychange change', function () {
+				$('#search_content').empty()
+				let a = $(this).val().toLowerCase();
+				if (!a) {
+					$('#nothing').show();
+					return;
+				}
+				let flag = true;
+				for (let i = 0; i < data.classes.length; ++i) {
+					let cla = data.classes[i];
+					if (cla.keyword1.includes(a) || cla.keyword2.includes(a)) {
+						flag = false;
+						$('#search_content').append(`<tr>\
+<td><span class="ui purple label">班级</span>${cla.keyword2}</td>\
+<td><button class="ui pink mini button" onclick="getDetailCla(${i})">点击查看</button></td>`);
+					}
+				}
+				for (let i = 0; i < data.athletes.length; ++i) {
+					let ath = data.athletes[i];
+					if (ath.keyword1.includes(a) || ath.keyword2.includes(a)) {
+						flag = false;
+						$('#search_content').append(`<tr>\
+<td><span class="ui pink label">学生</span>${ath.keyword1}</td>\
+<td><button class="ui pink mini button" onclick="getDetailStu(${i})">点击查看</button></td>`);
+					}
+				}
+				if (flag) $('#nothing').show();
+				else $('#nothing').hide();
+			})
+		})
+}
+$(document).ready(function () {
+	let str = $('#titleVal').val();
+	console.log(str);
+	$('title').text(`${str} - 成绩表 2.0`);
+	if ($('#season_content').length) {
+		fetchContest();
+	}
+	if ($('#search_content').length) {
+		fetchSearch();
+	}
+})
+$('#mainUiContainer').bind('pjax:start', function () {
+	NProgress.start();
+})
+
+$('#mainUiContainer').bind('pjax:end', function () {
+	NProgress.done();
+	$('.ui.mobile.sidebar').sidebar('hide');
+	let str = $('#titleVal').val();
+	console.log(str);
+	$('title').text(`${str} - 成绩表 2.0`);
+	let sid = getSeasonId();
+	if (sid) {
+		if ($('a.ex').length == 0) {
+			$('a.bs.desktop').after(`<a class="ex desktop item" href="/sport/season/${sid}"><i class="fal fa-signal"></i> 比赛列表</a>\
+<a class="ex desktop item" href="/sport/season/${sid}/search"><i class="fal fa-search"></i> 智慧搜索</a>`);
+			$('a.bs.mobile').after(`<a class="ex mobile item" href="/sport/season/${sid}"><i class="fal fa-signal"></i> 比赛列表</a>\
+<a class="ex mobile item" href="/sport/season/${sid}/search"><i class="fal fa-search"></i> 智慧搜索</a>`);
+		}
+		if ($('#season_content').length) {
+			// Real-time fetch
+			fetchContest();
+			setInterval(fetchContest, 10000);
+		}
+		if ($('#search_content').length) {
+			// Real-time fetch
+			fetchSearch();
+			setInterval(fetchSearch, 10000);
+		}
+	} else {
+		$('a.ex').remove();
+	}
+})
+</script>
+</div>
+</body>
+
+</html>

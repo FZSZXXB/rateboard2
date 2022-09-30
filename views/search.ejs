@@ -1,0 +1,51 @@
+<% if (!pjax) { %>
+<% this.title = '智慧搜索' %>
+<%- include("head") %>
+<% } %>
+
+<textarea id="titleVal" style="display:none;">智慧搜索</textarea>
+<div style="text-align: center;"><h1><span class='req'>智慧</span>搜索</h1></div>
+
+<div class="ui fluid icon input">
+	<input class="prompt" style="border-radius: 50px;"id="searchInput" type="text" placeholder="搜索">
+	<i class="search icon"></i>
+</div>
+<div class="ui blue icon message">
+	<i class="fad fa-info"></i>
+	<div class="content">
+		<div class="req header" style="margin-bottom: 10px; ">
+			食用方法
+		</div>
+		<p>
+			输入选手姓名、班级来查询他们的获奖记录。
+			<br>
+			您还可以输入姓名首字母缩写、班级代号来快速查找：如输入 <code>lts</code>搜索“李田所”，<code>114</code>搜索“高一14班”。
+		</p>
+	</div>
+</div>
+<div class="ui segment">
+	<table class="ui basic celled left aligned unstackable table">
+		<thead>
+			<tr>
+				<th id="name">搜索结果</th>
+				<th id="detail">详细信息</th>
+			</tr>
+		</thead>
+		<tbody id="search_content"></tbody>
+	</table>
+	<div class="ui placeholder segment" id="nothing">
+		<div class="ui icon header">
+			<i class="fad fa-radar status pending" style="margin-bottom: 20px; "></i>
+			<span class="description">暂无数据~</span>
+		</div>
+	</div>
+</div>
+<div class="ui modal" id="infoModal">
+	<div class="ui header" id="infoTitle"></div>
+	<div class="content" id="infoContent"></div>
+</div>
+
+
+<% if (!pjax) { %>
+<%- include("foot") %>
+<% } %>

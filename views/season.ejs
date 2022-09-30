@@ -1,0 +1,99 @@
+<% if (!pjax) { %>
+<% this.title = season.title %>
+<%- include("head") %>
+<% } %>
+
+<textarea id="titleVal" style="display:none;"><%= season.title %></textarea>
+<% if (user) { %>
+<div style="text-align: right !important;">
+	<a class="ui purple labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'edit']) %>">
+		<i class="icon fas fa-edit"></i>修改资料
+	</a>
+	<a class="ui pink labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'contest', 0, 'edit']) %>">
+		<i class="icon fas fa-plus"></i>新建比赛
+	</a>
+</div>
+<% } %>
+<h4 class="ui top attached block header"><i class="fad fa-info-circle status pending"></i>公告</h4>
+<div class="ui bottom attached segment" id="season_content">
+</div>
+<h4 class="ui top attached block header"><i class="fad fa-signal status judgement_failed"></i>比赛列表</h4>
+<div class="ui bottom attached segment">
+	<table class="ui basic celled center aligned unstackable table">
+		<thead>
+			<tr>
+				<th id="title">名称</th>
+				<th id="time">时间</th>
+				<th id="rankId">排名</th>
+				<% if (user) { %>
+					<th>操作</th>
+				<% } %>
+			</tr>
+		</thead>
+		<tbody id="contests"></tbody>
+	</table>
+</div>
+<div class="ui placeholder segment" id="no_contest">
+	<div class="ui icon header">
+		<i class="fad fa-calendar" style="margin-bottom: 20px; "></i>
+		暂无比赛，敬请期待~
+	</div>
+</div>
+<div class="ui modal" id="rankingModal">
+	<div class="ui header" id="rankingTitle"></div>
+	<div class="content">
+		<table class="ui very basic center aligned unstackable table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>班级</th>
+					<th>选手</th>
+					<th>得分</th>
+					<th>备注</th>
+				</tr>
+			</thead>
+			<tbody id="rankingContent"></tbody>
+		</table>
+	</div>
+	<div class="actions">
+		<div class="ui approve pink button">确认</div>
+	</div>
+</div>
+
+<script>
+function getRanking(ranking_id, contest_index) {
+	$('#rankingModal').modal('show');
+	fetch(`/sport/season/<%= season.id %>/ranking/${ranking_id}?dataOnly=true`)
+	.then(response => response.json())
+	.then(data => {
+		let contests = JSON.parse(localStorage.getItem(`season_contests`));
+		$('#rankingTitle').text(contests[contest_index].title + '的排行榜');
+		$('#rankingContent').empty();
+		let arr = data.data.split('\n').filter(x => x).map(x => x.split(' ').filter(x => x));
+		let rk = 0;
+		for (let i = 0; i < arr.length; ++i) {
+			if (rk == 0 || arr[i][2] != arr[i - 1][2]) ++rk;
+			let str = '';
+			str += '<tr><td>';
+			if (rk == 1)
+				str += `<div class="ui yellow ribbon label">${rk}</div></td>`;
+			else if (rk == 2)
+				str += `<div class="ui ribbon label">${rk}</div></td>`;
+			else if (rk == 3)
+				str += `<div class="ui brown ribbon label" style="background-color: #C47222 !important;">${rk}</div></td>`;
+			else
+				str += `${rk}</td>`;
+			for (let j = 0; j < arr[i].length; ++j) {
+				if (j == 0) arr[i][j] = transClass(arr[i][j]);
+				str += `<td>${arr[i][j]}</td>`;
+			}
+			str += '</tr>';
+			$('#rankingContent').append(str);
+		}
+	})
+}
+</script>
+
+<% if (!pjax) { %>
+<%- include("foot") %>
+<% } %>

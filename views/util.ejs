@@ -1,0 +1,104 @@
+<%
+this.builtInCdnUrl = 'https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.1.0';
+
+this.lib = uri => { return builtInCdnUrl + '/cdnjs/' + uri; }
+this.selfLib = uri => { return builtInCdnUrl + '/self/' + uri; }
+%> 
+<script>
+function transClass(str) {
+  try {
+    let gradeId = parseInt(str[0]);
+    let ans = '';
+    switch (gradeId) {
+      case 1: ans += '高一'; break;
+      case 2: ans += '高二'; break;
+      case 3: ans += '高三'; break;
+      default: throw new Error('年段配置错误');
+    }
+    str[0] = 0;
+    let classId = parseInt(str.slice(1));
+    ans += '（' + classId + '）班';
+    return ans;
+  } catch (e) {
+    swal({
+      title: "错误",
+      icon: "error",
+      text: e.message
+    });
+    console.log(e.message);
+    return '&&&';
+  }
+}
+
+let getGradeName = (grade) => {
+  switch (grade) {
+    case 0:
+      return '教工';
+    case 1:
+      return '高一';
+    case 2:
+      return '高二';
+    case 3:
+      return '高三';
+    default:
+      return undefined;
+  }
+};
+
+let getTypeName = (type) => {
+  switch (type) {
+    case 'stu_male':
+      return '男子组';
+    case 'stu_female':
+      return '女子组';
+    case 'stu_union':
+      return '集体组';
+    case 'teach_1':
+      return '甲组';
+    case 'teach_2':
+      return '乙组';
+    case 'teach_3':
+      return '丙组';
+    case 'teach_union':
+      return '集体组';
+    default:
+      return undefined;
+  }
+};
+
+let getGradeColor = (grade) => {
+  switch (grade) {
+    case 0:
+      return 'purple';
+    case 1:
+      return 'red';
+    case 2:
+      return 'orange';
+    case 3:
+      return 'blue';
+    default:
+      return undefined;
+  }
+};
+
+let getTypeColor = (type) => {
+  switch (type) {
+    case 'stu_male':
+      return 'purple';
+    case 'stu_female':
+      return 'pink';
+    case 'stu_union':
+      return 'teal';
+    case 'teach_1':
+      return 'blue';
+    case 'teach_2':
+      return 'cyan';
+    case 'teach_3':
+      return 'red';
+    case 'teach_union':
+      return 'orange';
+    default:
+      return undefined;
+  }
+};
+</script>

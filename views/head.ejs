@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="position: fixed; width: 100%; overflow: hidden; ">
+<head>
+	<style>
+	.ui.menu .item>i.fal {
+		opacity: .9;
+		float: none;
+		margin: 0 .35714286em 0 0;
+	}
+	.req {
+		background: -webkit-linear-gradient(#d12d9c, #5ea2ef) !important;
+		-webkit-background-clip: text !important;
+		-webkit-text-fill-color: transparent !important;
+		animation: gradient 15s ease infinite !important;
+		box-shadow: none !important;
+	}
+	</style>
+	<meta charset="utf-8">
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
+	<meta name="viewport" content="width=device-width">
+	<title>Loading... - 成绩表 2.0</title>
+	<link href="https://cdn.fzsz.net/css/semantic.css" rel="stylesheet">
+	<link href="https://cdn.fzsz.net/fontawesome/css/all.min.css" rel="stylesheet">
+	<link href="/sport/css/main.css?v=202209231311", rel="stylesheet">
+	<link rel="shortcut icon" type="image/jpg" href="/favicon.ico"/>
+	<script src="https://cdn.fzsz.net/js/jquery.min.js"></script>
+	<script src="https://cdn.fzsz.net/js/sweetalert.min.js"></script>
+	<script src="https://cdn.fzsz.net/js/marked.min.js"></script>
+	<script src="https://cdn.fzsz.net/js/semantic.min.js"></script>
+	<link href="https://cdn.fzsz.net/css/nprogressReq.css" rel="stylesheet">
+	<script src="https://cdn.fzsz.net/js/nprogress.js"></script>
+	<script src="https://cdn.fzsz.net/js/markdown-palettes.min.js"></script>
+	<script>var markdownEditor;</script>
+	<%- include('util') %>
+</head>
+<body>
+		
+	<div class="wrapper">
+		<div id="web_bg" style="background-image: url(https://cdn.fzsz.net/img/005.webp);"></div>
+	</div>
+    <div class="ui fixed borderless menu" style="position: fixed; min-height: 49px; ">
+			<div id="mainMenuContainer" class="ui container">
+				<div class="header item" style="font-size: 22px;">成绩表&nbsp;<span class="req">2.0</p></div>
+				<a class="bs desktop item" href="<%= web_util.makeUrl(['']) %>"><i class="fal fa-home"></i> 首页</a>
+				<% if (seasonId) { %>
+				<a class="ex desktop item" href="<%= web_util.makeUrl(['season', seasonId]) %>"><i class="fal fa-signal"></i> 比赛列表</a>
+				<a class="ex desktop item" href="<%= web_util.makeUrl(['season', seasonId, 'search']) %>"><i class="fal fa-search"></i> 智慧搜索</a>
+				<% } %>
+				<div class="right menu">
+				<% if (user) { %>
+				<div class="ui simple dropdown desktop item">
+					<span class="user" style="margin-right: 5px;"><%= user.username %></span><i class="fal fa-angle-down"></i>
+					<div class="menu">
+						<a class="item noPjax" href="<%= web_util.makeUrl(['loginPage', 'logout'], { nex: req.query['url'] || req.originalUrl }) %>"><i class="fal fa-power-off"></i>注销</a>
+					</div>
+				</div>
+				<% } else { %>
+				<div class="desktop item noPjax">
+					<a class="ui button" style="margin-right: 0.5em; " href="<%= web_util.makeUrl(['loginPage'], { nex: req.query['url'] || req.originalUrl }) %>">
+						登录
+					</a>
+					<a class="ui primary button noPjax" href="<%= web_util.makeUrl(['registerPage'], { nex: req.query['url'] || req.originalUrl }) %>">
+						注册
+					</a>
+				</div>
+				<% } %>
+				<a class="mobile start item" style="color: #6435c9;"><i aria-hidden="true" class="fal fa-bars" style="background: -webkit-linear-gradient(#d12d9c, #5ea2ef);
+					-webkit-background-clip: text;
+					-webkit-text-fill-color: transparent;
+					animation: gradient 15s ease infinite;
+					box-shadow: none;"></i></a>
+				</div>
+				<div class="ui mobile push right sidebar vertical menu" id="mobileMenuContainer">
+					<div class="mobile item" style="font-size: 23px; text-align: center;" href="<%= web_util.makeUrl(['']) %>">成绩表 <span class="req">2.0</p></div>
+					<% if (user) { %>
+					<span class="item user" style="text-align: center;">已登录用户：<%= user.username %></span>
+					<div class="item">
+						<div class="ui fluid buttons">
+							<a class="ui red button noPjax" href="<%= web_util.makeUrl(['loginPage', 'logout'], { nex: req.query['url'] || req.originalUrl }) %>"><i class="fal fa-power-off"></i>注销</a>
+						</div>
+					</div>
+					<% } else { %>
+					<div class="item">
+						<div class="ui fluid buttons">
+							<a class="ui button noPjax" href="<%= web_util.makeUrl(['loginPage'], { nex: req.query['url'] || req.originalUrl }) %>">登录</a>
+							<a class="ui primary button noPjax" href="<%= web_util.makeUrl(['registerPage'], { nex: req.query['url'] || req.originalUrl }) %>">注册</a>
+						</div>
+					</div>
+					<% } %>
+					<a class="bs mobile item" href="<%= web_util.makeUrl(['']) %>"><i class="fal fa-home"></i> 首页</a>
+					<% if (seasonId) { %>
+					<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId]) %>"><i class="fal fa-signal"></i> 比赛列表</a>
+					<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId, 'search']) %>"><i class="fal fa-search"></i> 智慧搜索</a>
+					<% } %>
+				</div>
+			</div>
+    </div>
+	<!-- <script type="text/javascript" src="//cdn.repository.webfont.com/wwwroot/js/wf/youziku.api.min.js"></script> -->
+	
+	<!-- <div style="margin-top: 49px; height: calc(100% - 49px); overflow-y: auto;"> -->
+	<div style="margin-top: 77px; ">
+	<div id="mainUiContainer" class="ui main container">

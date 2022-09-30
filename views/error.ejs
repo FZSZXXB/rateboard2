@@ -1,0 +1,19 @@
+<% if (!pjax) { %>
+<% this.title = '错误' %>
+<%- include("head") %>
+<% } %>
+
+<textarea id="titleVal" style="display:none;">错误</textarea>
+<div class="ui negative icon message">
+  <i class="fad fa-times"></i>
+  <div class="content">
+    <div class="header" style="margin-bottom: 10px; ">
+      错误
+    </div>
+    <p><%= error %></p>
+  </div>
+</div>
+
+<% if (!pjax) { %>
+<%- include("foot") %>
+<% } %>
