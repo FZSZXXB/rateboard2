@@ -61,37 +61,6 @@
 </div>
 
 <script>
-function getRanking(ranking_id, contest_index) {
-	$('#rankingModal').modal('show');
-	fetch(`/sport/season/<%= season.id %>/ranking/${ranking_id}?dataOnly=true`)
-	.then(response => response.json())
-	.then(data => {
-		let contests = JSON.parse(localStorage.getItem(`season_contests`));
-		$('#rankingTitle').text(contests[contest_index].title + '的排行榜');
-		$('#rankingContent').empty();
-		let arr = data.data.split('\n').filter(x => x).map(x => x.split(' ').filter(x => x));
-		let rk = 0;
-		for (let i = 0; i < arr.length; ++i) {
-			if (rk == 0 || arr[i][2] != arr[i - 1][2]) ++rk;
-			let str = '';
-			str += '<tr><td>';
-			if (rk == 1)
-				str += `<div class="ui yellow ribbon label">${rk}</div></td>`;
-			else if (rk == 2)
-				str += `<div class="ui ribbon label">${rk}</div></td>`;
-			else if (rk == 3)
-				str += `<div class="ui brown ribbon label" style="background-color: #C47222 !important;">${rk}</div></td>`;
-			else
-				str += `${rk}</td>`;
-			for (let j = 0; j < arr[i].length; ++j) {
-				if (j == 0) arr[i][j] = transClass(arr[i][j]);
-				str += `<td>${arr[i][j]}</td>`;
-			}
-			str += '</tr>';
-			$('#rankingContent').append(str);
-		}
-	})
-}
 </script>
 
 <% if (!pjax) { %>
