@@ -3,7 +3,7 @@
 	<div class="ui center aligned container">
 		<span style="color: #999999;">
 			成绩表2.0 基于开源项目 <a href="https://gh.reqwey.com/FZSZXXB/rateboard2"><i class="icon github"></i>Rateboard 2</a>
-			<a style="color: #999999;" href="https://gh.reqwey.com/FZSZXXB/rateboard2/commit/f8b08e81bd6ecd9c49b8abeb367a4f3364960d07">#f8b08e8</a>
+			<a style="color: #999999;" href="https://gh.reqwey.com/FZSZXXB/rateboard2/commit/1bcdb0ca34b9fe4665b028f5648ee944f49c6515">#1bcdb0c</a>
 		<br>
 		<span style="color: #999999;">
 			2022 ❤️ 福三中学生小助手 | 福州三中信息技术部
@@ -208,14 +208,17 @@ $(document).pjax('a:not(.noPjax)', {
 	storage: false,  //是否使用本地存储
 	titleSuffix: '', //标题后缀
 })
-function fetchContest() {
-	if (localStorage.getItem("last_fetch_time") != null) {
-		let ls = new Date(localStorage.getItem("last_fetch_time"));
-		if ((new Date()) - ls <= 10000) return;
-		else localStorage.setItem("last_fetch_time", (new Date()).toString());
-	} else {
-		localStorage.setItem("last_fetch_time", (new Date()).toString());
+function fetchContest(interval) {
+	if (interval) {
+		if (localStorage.getItem("last_fetch_time") != null) {
+			let ls = new Date(localStorage.getItem("last_fetch_time"));
+			if ((new Date()) - ls <= 10000) return;
+			else localStorage.setItem("last_fetch_time", (new Date()).toString());
+		} else {
+			localStorage.setItem("last_fetch_time", (new Date()).toString());
+		}
 	}
+	
 	$('#season_content').empty();
 	$('#contests').empty();
 	fetch(`/sport/season/${getSeasonId()}?dataOnly=true`)
@@ -244,13 +247,15 @@ function fetchContest() {
 			}
 		});
 }
-function fetchSearch() {
-	if (localStorage.getItem("last_fetch_time") != null) {
-		let ls = new Date(localStorage.getItem("last_fetch_time"));
-		if ((new Date()) - ls <= 10000) return;
-		else localStorage.setItem("last_fetch_time", (new Date()).toString());
-	} else {
-		localStorage.setItem("last_fetch_time", (new Date()).toString());
+function fetchSearch(interval) {
+	if (interval) {
+		if (localStorage.getItem("last_fetch_time") != null) {
+			let ls = new Date(localStorage.getItem("last_fetch_time"));
+			if ((new Date()) - ls <= 10000) return;
+			else localStorage.setItem("last_fetch_time", (new Date()).toString());
+		} else {
+			localStorage.setItem("last_fetch_time", (new Date()).toString());
+		}
 	}
 	fetch(`/sport/season/${getSeasonId()}/search?dataOnly=true`)
 		.then(response => response.json())
@@ -303,12 +308,12 @@ $(document).ready(function () {
 	if ($('#season_content').length) {
 		// Real-time fetch
 		fetchContest();
-		setInterval(fetchContest, 10000);
+		setInterval(function () { fetchContest(true) }, 10000);
 	}
 	if ($('#search_content').length) {
 		// Real-time fetch
 		fetchSearch();
-		setInterval(fetchSearch, 10000);
+		setInterval(function () { fetchSearch(true) }, 10000);
 	}
 })
 $('#mainUiContainer').bind('pjax:start', function () {
@@ -332,12 +337,12 @@ $('#mainUiContainer').bind('pjax:end', function () {
 		if ($('#season_content').length) {
 			// Real-time fetch
 			fetchContest();
-			setInterval(fetchContest, 10000);
+			setInterval(function () { fetchContest(true) }, 10000);
 		}
 		if ($('#search_content').length) {
 			// Real-time fetch
 			fetchSearch();
-			setInterval(fetchSearch, 10000);
+			setInterval(function () { fetchSearch(true) }, 10000);
 		}
 	} else {
 		$('a.ex').remove();
