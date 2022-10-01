@@ -4,16 +4,19 @@
 <% } %>
 
 <textarea id="titleVal" style="display:none;"><%= season.title %></textarea>
-<% if (user) { %>
-<div style="text-align: right !important;">
-	<a class="ui purple labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'edit']) %>">
-		<i class="icon fas fa-edit"></i>修改资料
-	</a>
-	<a class="ui pink labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'contest', 0, 'edit']) %>">
-		<i class="icon fas fa-plus"></i>新建比赛
-	</a>
+<div style="display: inline;">
+	<h1><%= season.title %></h1>
+	<% if (user) { %>
+		<div style="text-align: right !important">
+			<a class="ui purple labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'edit']) %>">
+				<i class="icon fas fa-edit"></i>修改资料
+			</a>
+			<a class="ui pink labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'contest', 0, 'edit']) %>">
+				<i class="icon fas fa-plus"></i>新建比赛
+			</a>
+		</div>
+		<% } %>
 </div>
-<% } %>
 <h4 class="ui top attached block header"><i class="fad fa-info-circle status pending"></i>公告</h4>
 <div class="ui bottom attached segment" id="season_content">
 </div>
@@ -30,18 +33,20 @@
 				<% } %>
 			</tr>
 		</thead>
-		<tbody id="contests"></tbody>
+		<tbody id="contests">
+		</tbody>
 	</table>
-</div>
-<div class="ui placeholder segment" id="no_contest">
-	<div class="ui icon header">
-		<i class="fad fa-calendar" style="margin-bottom: 20px; "></i>
-		暂无比赛，敬请期待~
+	<div class="ui placeholder segment" id="no_contest">
+		<div class="ui icon header">
+			<i class="fad status judgement_failed fa-calendar-exclamation" style="margin-bottom: 20px; "></i>
+			<span class="description">暂无比赛，敬请期待~</span>
+		</div>
 	</div>
 </div>
 <div class="ui modal" id="rankingModal">
 	<div class="ui header" id="rankingTitle"></div>
 	<div class="content">
+		<div id="rankingLoader" class="ui disabled loader"></div>
 		<table class="ui very basic center aligned unstackable table">
 			<thead>
 				<tr>
@@ -52,7 +57,8 @@
 					<th>备注</th>
 				</tr>
 			</thead>
-			<tbody id="rankingContent"></tbody>
+			<tbody id="rankingContent">
+			</tbody>
 		</table>
 	</div>
 	<div class="actions">

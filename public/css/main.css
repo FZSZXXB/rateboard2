@@ -114,7 +114,7 @@
 input[type=text] {
   width: 100%;
   vertical-align: top;
-  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'fwzc', Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
   margin: 0;
   outline: 0;
   -webkit-appearance: none;
@@ -207,7 +207,7 @@ body {
     /* M$ */
     'WenQuanYi Micro Hei',
     /* *nix */
-    sans-serif;
+    sans-serif !important;
 }
 
 @media only screen and (max-width: 992px) {

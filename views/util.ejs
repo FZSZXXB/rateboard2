@@ -8,13 +8,17 @@ this.selfLib = uri => { return builtInCdnUrl + '/self/' + uri; }
 
 function getRanking(ranking_id, contest_index) {
 	$('#rankingModal').modal('show');
-	fetch(`/sport/season/<%= season.id %>/ranking/${ranking_id}?dataOnly=true`)
+  $('#rankingLoader').removeClass('disabled');
+  $('#rankingLoader').addClass('active');
+	let contests = JSON.parse(localStorage.getItem(`season${getSeasonId()}_contests`));
+  $('#rankingTitle').text(contests[contest_index].title + '的排行榜');
+  $('#rankingContent').empty();
+  fetch(`/sport/season/${getSeasonId()}/ranking/${ranking_id}?dataOnly=true`)
 	.then(response => response.json())
 	.then(data => {
     console.log("Start loading ranking")
-		let contests = JSON.parse(localStorage.getItem(`season${getSeasonId()}_contests`));
-		$('#rankingTitle').text(contests[contest_index].title + '的排行榜');
-		$('#rankingContent').empty();
+		
+    
 		let arr = data.data.split('\n').filter(x => x).map(x => x.split(' ').filter(x => x));
 		let rk = 0;
 		for (let i = 0; i < arr.length; ++i) {
@@ -35,6 +39,8 @@ function getRanking(ranking_id, contest_index) {
 			}
 			str += '</tr>';
 			$('#rankingContent').append(str);
+      $('#rankingLoader').addClass('disabled');
+      $('#rankingLoader').removeClass('active');
 		}
 	})
 }
