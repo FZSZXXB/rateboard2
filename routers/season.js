@@ -45,32 +45,6 @@ router.get('/:id', async (req, res) => {
 	}
 })
 
-router.get('/:id/formatClass', async (req, res) => {
-	try {
-		let id = parseInt(req.params.id);
-
-		let seasons = await myQuery(`SELECT * FROM season WHERE id = ?`, [id]);
-
-		if (seasons.length == 0) throw '赛季不存在';
-
-		let rankings = await myQuery(`SELECT * FROM ranking WHERE season = ?`, id);
-		let count = 0;
-		await rankings.data.forEachAsync(async x => {
-			let y = x.split('\n').filter(x => x);
-			for (let a of y) {
-				let c = a.split(' ').filter(x => x);
-				let b = parseInt(c[0])
-				if (b < 100) b = Math.floor(b / 100) + b % 10, count++;
-				a = c.join(' ');
-			}
-			x = y.join('\n');
-		})
-	} catch (e) {
-		console.warn(e);
-		res.render('error', { error: e });
-	}
-})
-
 router.get('/:id/edit', checklogin, async (req, res) => {
 	try {
 		let id = parseInt(req.params.id);
