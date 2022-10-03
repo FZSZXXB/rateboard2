@@ -190,6 +190,7 @@ function success(session_id) {
 	});
 }
 $('#submit_contest').click(function () {
+	$('#submit_contest').addClass('loading');
 	$.ajax({
 		url: `/sport/season/<%= contest.season %>/contest/${getContestId()}/edit`,
 		type: 'POST',
@@ -220,13 +221,17 @@ $('#submit_contest').click(function () {
 					success(data.session_id);
 					return;
 				default:
-					show_error("未知错误。" + data.detail);
+					show_error(data.detail);
 					break;
 			}
+			$("#submit_contest").text("发布比赛");
+			$("#submit_contest").removeClass("loading");
+
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
-			alert(XMLHttpRequest.responseText);
-			show_error("未知错误");
+			show_error("XHR 错误: " + XMLHttpRequest.responseText);
+			$("#submit_contest").text("发布比赛");
+			$("#submit_contest").removeClass("loading");
 		}
 	});
 });

@@ -81,6 +81,8 @@ function login() {
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			show_error(XMLHttpRequest.responseText);
 			$("#login").text("登录");
+			$("#login").removeClass("loading");
+
 		}
 	});
 }
