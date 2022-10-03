@@ -3,7 +3,18 @@ this.builtInCdnUrl = 'https://cdn.jsdelivr.net/npm/syzoj-public-cdn@1.1.0';
 
 this.lib = uri => { return builtInCdnUrl + '/cdnjs/' + uri; }
 this.selfLib = uri => { return builtInCdnUrl + '/self/' + uri; }
-%> 
+
+this.seasonStatus = function (st, ed) {
+  let now = web_util.getCurrentDate();
+  if (now - ed > 0) return -1;
+  else if (now - st >= 0) return 0;
+  else return 1;
+}
+
+this.contestLen = function (str) {
+  return str.split('|').length;
+}
+%>
 <script>
 
 function getRanking(ranking_id, contest_index) {
@@ -59,11 +70,11 @@ function transClass(str) {
     ans += '（' + classId + '）班';
     return ans;
   } catch (e) {
-    swal({
-      title: "错误",
-      icon: "error",
-      text: e.message
-    });
+    // swal({
+    //   title: "错误",
+    //   icon: "error",
+    //   text: e.message
+    // });
     console.log(e.message);
     return '&&&';
   }

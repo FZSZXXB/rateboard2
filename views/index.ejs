@@ -13,8 +13,27 @@
 <% } %>
 <% if (seasons.length) { for (let a of seasons) { %>
 <div class="ui segment">
-  <div class="post-head"><a class="post-title" href="<%= web_util.makeUrl(['season', a.id]) %>"><h2 class="post-title-link"><%= a.title %></h2></a></div>
-
+  <div class="post-head">
+    <a class="post-title" href="<%= web_util.makeUrl(['season', a.id]) %>"><h1 class="post-title-link"><%= a.title %></h1></a>
+  </div>
+<div class="ui two mini statistics">
+  <div class="ui mini <%= seasonStatus(a.start_time, a.end_time) == 0 ? 'green' : (seasonStatus(a.start_time, a.end_time) == -1 ? 'grey' : 'red') %> statistic">
+    <div class="value">
+      <%= seasonStatus(a.start_time, a.end_time) == 0 ? '进行中' : (seasonStatus(a.start_time, a.end_time)==-1 ? '已结束' : '未开始' ) %>
+    </div>
+    <div class="label">
+      状态
+    </div>
+  </div>
+  <div class="ui mini statistic">
+    <div class="value req">
+      <%= a.contest_len %>
+    </div>
+    <div class="label">
+      比赛数
+    </div>
+  </div>
+</div>
 <p class="description">
   <% if (a.content) { %><%- a.content %>
   <% } else { %>暂无描述~<% } %>
@@ -30,6 +49,10 @@
   </div>
 </div>
 <% } %>
+
+<script>
+
+</script>
 
 <% if (!pjax) { %>
 <%- include("foot") %>

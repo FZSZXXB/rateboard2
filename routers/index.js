@@ -15,6 +15,8 @@ module.exports = async (app) => {
 				r.content =
 					md.render(r.content)
 						.replace('<table>', '<table class="ui very basic unstackable table">');
+				let contests = await myQuery(`SELECT * FROM contest WHERE season = ?`, [r.id]);
+				r.contest_len = contests.length;
 			})
 
 			res.render("index", {

@@ -3,7 +3,9 @@
 	<div class="ui center aligned container">
 		<span style="color: #999999;">
 			成绩表2.0 基于开源项目 <a href="https://gh.reqwey.com/FZSZXXB/rateboard2"><i class="icon github"></i>Rateboard 2</a>
-			<a style="color: #999999;" href="https://gh.reqwey.com/FZSZXXB/rateboard2/commit/1bcdb0ca34b9fe4665b028f5648ee944f49c6515">#1bcdb0c</a>
+			<!-- <a style="color: #999999;" href="https://gh.reqwey.com/FZSZXXB/rateboard2/commit/848755e35999b0368c99f629ed15729ef147cd2c">#848755e
+			</a> -->
+			(更改未提交)
 		<br>
 		<span style="color: #999999;">
 			2022 ❤️ 福三中学生小助手 | 福州三中信息技术部
@@ -208,19 +210,7 @@ $(document).pjax('a:not(.noPjax)', {
 	storage: false,  //是否使用本地存储
 	titleSuffix: '', //标题后缀
 })
-function fetchContest(interval) {
-	if (interval) {
-		if (localStorage.getItem("last_fetch_time") != null) {
-			let ls = new Date(localStorage.getItem("last_fetch_time"));
-			if ((new Date()) - ls <= 10000) return;
-			else localStorage.setItem("last_fetch_time", (new Date()).toString());
-		} else {
-			localStorage.setItem("last_fetch_time", (new Date()).toString());
-		}
-	}
-	
-	$('#season_content').empty();
-	$('#contests').empty();
+function fetchContest() {
 	fetch(`/sport/season/${getSeasonId()}?dataOnly=true`)
 		.then(response => response.json())
 		.then(data => {
@@ -229,17 +219,18 @@ function fetchContest(interval) {
 			localStorage.setItem(`season${getSeasonId()}_contests`, JSON.stringify(data.contests));
 			let contests = data.contests;
 			let label = true;
+			let contest_str = '';
 			Array.prototype.forEach.call(contests, (contest, index) => {
 				label = false;
-				$('#contests').append(`<tr>
+				contest_str += `<tr>
 <td><span class="p-${getGradeColor(contest.grade)}">${getGradeName(contest.grade)}</span>
 <span class="p-${getTypeColor(contest.type)}">${getTypeName(contest.type)}</span>${contest.title}</td>
 <td>${contest.time}</td>
 <td><button class="ui pink button" onclick="getRanking(${contest.rankId}, ${index})">点击查看</button></td>
 <% if (user) { %><td><a class="ui purple button" href="/sport/season/${contest.season}/contest/${contest.id}/edit">编辑</a></td><% } %>
-</tr>`)
+</tr>`;
 			});
-
+			$('#season_contests').html(contest_str);
 			if (label) {
 				$('#no_contest').show();
 			} else {
@@ -247,16 +238,7 @@ function fetchContest(interval) {
 			}
 		});
 }
-function fetchSearch(interval) {
-	if (interval) {
-		if (localStorage.getItem("last_fetch_time") != null) {
-			let ls = new Date(localStorage.getItem("last_fetch_time"));
-			if ((new Date()) - ls <= 10000) return;
-			else localStorage.setItem("last_fetch_time", (new Date()).toString());
-		} else {
-			localStorage.setItem("last_fetch_time", (new Date()).toString());
-		}
-	}
+function fetchSearch() {
 	fetch(`/sport/season/${getSeasonId()}/search?dataOnly=true`)
 		.then(response => response.json())
 		.then(data => {
@@ -305,15 +287,20 @@ $(document).ready(function () {
 	let str = $('#titleVal').val();
 	console.log(str);
 	$('title').text(`${str} - 成绩表 2.0`);
-	if ($('#season_content').length) {
-		// Real-time fetch
-		fetchContest();
-		setInterval(function () { fetchContest(true) }, 10000);
-	}
-	if ($('#search_content').length) {
-		// Real-time fetch
-		fetchSearch();
-		setInterval(function () { fetchSearch(true) }, 10000);
+	if (getSeasonId()) {
+		fetchContest(); fetchSearch();
+		
+		setInterval(function () {
+			if (localStorage.getItem("last_fetch_time") != null) {
+				let ls = new Date(localStorage.getItem("last_fetch_time"));
+				if ((new Date()) - ls <= 10000) return;
+				else localStorage.setItem("last_fetch_time", (new Date()).toString());
+			} else {
+				localStorage.setItem("last_fetch_time", (new Date()).toString());
+			}
+			fetchContest(); fetchSearch();
+		}, 10000);
+		
 	}
 })
 $('#mainUiContainer').bind('pjax:start', function () {
@@ -334,15 +321,20 @@ $('#mainUiContainer').bind('pjax:end', function () {
 			$('a.bs.mobile').after(`<a class="ex mobile item" href="/sport/season/${sid}"><i class="fal fa-signal"></i> 比赛列表</a>\
 <a class="ex mobile item" href="/sport/season/${sid}/search"><i class="fal fa-search"></i> 智慧搜索</a>`);
 		}
-		if ($('#season_content').length) {
-			// Real-time fetch
-			fetchContest();
-			setInterval(function () { fetchContest(true) }, 10000);
-		}
-		if ($('#search_content').length) {
-			// Real-time fetch
-			fetchSearch();
-			setInterval(function () { fetchSearch(true) }, 10000);
+		if (getSeasonId()) {
+			fetchContest(); fetchSearch();
+
+			setInterval(function () {
+				if (localStorage.getItem("last_fetch_time") != null) {
+					let ls = new Date(localStorage.getItem("last_fetch_time"));
+					if ((new Date()) - ls <= 10000) return;
+					else localStorage.setItem("last_fetch_time", (new Date()).toString());
+				} else {
+					localStorage.setItem("last_fetch_time", (new Date()).toString());
+				}
+				fetchContest(); fetchSearch();
+			}, 10000);
+
 		}
 	} else {
 		$('a.ex').remove();

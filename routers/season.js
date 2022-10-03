@@ -45,6 +45,32 @@ router.get('/:id', async (req, res) => {
 	}
 })
 
+router.get('/:id/formatClass', async (req, res) => {
+	try {
+		let id = parseInt(req.params.id);
+
+		let seasons = await myQuery(`SELECT * FROM season WHERE id = ?`, [id]);
+
+		if (seasons.length == 0) throw '赛季不存在';
+
+		let rankings = await myQuery(`SELECT * FROM ranking WHERE season = ?`, id);
+		let count = 0;
+		await rankings.data.forEachAsync(async x => {
+			let y = x.split('\n').filter(x => x);
+			for (let a of y) {
+				let c = a.split(' ').filter(x => x);
+				let b = parseInt(c[0])
+				if (b < 100) b = Math.floor(b / 100) + b % 10, count++;
+				a = c.join(' ');
+			}
+			x = y.join('\n');
+		})
+	} catch (e) {
+		console.warn(e);
+		res.render('error', { error: e });
+	}
+})
+
 router.get('/:id/edit', checklogin, async (req, res) => {
 	try {
 		let id = parseInt(req.params.id);
@@ -234,9 +260,10 @@ async function updSearchList(contest) { // Edit the searching data structure
 			if (athleteArr.length == 0) {
 				await myInsert(`INSERT INTO athlete(contests,abbr,name_class_season) VALUES(?,?,?)`, [cid + '#' + index, abbr, name_class_season]);
 			} else {
-				let newContests = athleteArr[0].contests.split('|').push(cid + '#' + index).join('|');
+				let newContests = athleteArr[0].contests.split('|');
+				newContests.push(cid + '#' + index);
 				await myQuery(`UPDATE athlete SET contests=?,abbr=? WHERE name_class_season = ?`,
-					[newContests, abbr, name_class_season]);
+					[newContests.join('|'), abbr, name_class_season]);
 			}
 		}
 	}
