@@ -29,12 +29,34 @@
 	<script src="https://cdn.fzsz.net/js/semantic.min.js"></script>
 	<link href="https://cdn.fzsz.net/css/nprogressReq.css" rel="stylesheet">
 	<script src="https://cdn.fzsz.net/js/nprogress.js"></script>
-	<script src="https://cdn.fzsz.net/js/markdown-palettes.min.js"></script>
-	<script>var markdownEditor;</script>
 	<%- include('util') %>
 </head>
 <body>
-		
+	
+<div class="ui mobile push right sidebar vertical menu" id="mobileMenuContainer">
+	<div class="mobile item" style="font-size: 23px; text-align: center;" href="<%= web_util.makeUrl(['']) %>">成绩表 <span class="req">2.0</p></div>
+	<% if (user) { %>
+	<span class="item user" style="text-align: center;">已登录用户：<%= user.username %></span>
+	<div class="item">
+		<div class="ui fluid buttons">
+			<a class="ui red button noPjax" href="<%= web_util.makeUrl(['loginPage', 'logout'], { nex: req.query['url'] || req.originalUrl }) %>"><i class="fal fa-power-off"></i>注销</a>
+		</div>
+	</div>
+	<% } else { %>
+	<div class="item">
+		<div class="ui fluid buttons">
+			<a class="ui button noPjax" href="<%= web_util.makeUrl(['loginPage'], { nex: req.query['url'] || req.originalUrl }) %>">登录</a>
+			<a class="ui primary button noPjax" href="<%= web_util.makeUrl(['registerPage'], { nex: req.query['url'] || req.originalUrl }) %>">注册</a>
+		</div>
+	</div>
+	<% } %>
+	<a class="bs mobile item" href="<%= web_util.makeUrl(['']) %>"><i class="fal fa-home"></i> 首页</a>
+	<% if (seasonId) { %>
+	<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId]) %>"><i class="fal fa-signal"></i> 比赛列表</a>
+	<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId, 'search']) %>"><i class="fal fa-search"></i> 智慧搜索</a>
+	<% } %>
+</div>
+<div class="pusher">
 	<div class="wrapper">
 		<div id="web_bg" style="background-image: url(https://cdn.fzsz.net/img/005.webp);"></div>
 	</div>
@@ -69,29 +91,6 @@
 					-webkit-text-fill-color: transparent;
 					animation: gradient 15s ease infinite;
 					box-shadow: none;"></i></a>
-				</div>
-				<div class="ui mobile push right sidebar vertical menu" id="mobileMenuContainer">
-					<div class="mobile item" style="font-size: 23px; text-align: center;" href="<%= web_util.makeUrl(['']) %>">成绩表 <span class="req">2.0</p></div>
-					<% if (user) { %>
-					<span class="item user" style="text-align: center;">已登录用户：<%= user.username %></span>
-					<div class="item">
-						<div class="ui fluid buttons">
-							<a class="ui red button noPjax" href="<%= web_util.makeUrl(['loginPage', 'logout'], { nex: req.query['url'] || req.originalUrl }) %>"><i class="fal fa-power-off"></i>注销</a>
-						</div>
-					</div>
-					<% } else { %>
-					<div class="item">
-						<div class="ui fluid buttons">
-							<a class="ui button noPjax" href="<%= web_util.makeUrl(['loginPage'], { nex: req.query['url'] || req.originalUrl }) %>">登录</a>
-							<a class="ui primary button noPjax" href="<%= web_util.makeUrl(['registerPage'], { nex: req.query['url'] || req.originalUrl }) %>">注册</a>
-						</div>
-					</div>
-					<% } %>
-					<a class="bs mobile item" href="<%= web_util.makeUrl(['']) %>"><i class="fal fa-home"></i> 首页</a>
-					<% if (seasonId) { %>
-					<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId]) %>"><i class="fal fa-signal"></i> 比赛列表</a>
-					<a class="ex mobile item" href="<%= web_util.makeUrl(['season', seasonId, 'search']) %>"><i class="fal fa-search"></i> 智慧搜索</a>
-					<% } %>
 				</div>
 			</div>
     </div>
