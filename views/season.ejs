@@ -4,18 +4,34 @@
 <% } %>
 
 <textarea id="titleVal" style="display:none;"><%= season.title %></textarea>
-<div style="display: inline;">
-	<h1><%= season.title %></h1>
+	
+<div style="text-align: center;" id="season_info">
+	<h1 style="font-size: 2.4rem !important"><span class="req">「</span><%= season.title %><span class="req">」</span></h1>
 	<% if (user) { %>
-		<div style="text-align: right !important">
-			<a class="ui purple labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'edit']) %>">
-				<i class="icon fas fa-edit"></i>修改资料
-			</a>
-			<a class="ui pink labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'contest', 0, 'edit']) %>">
-				<i class="icon fas fa-plus"></i>新建比赛
-			</a>
+		<a class="ui purple labeled icon button" href="<%= web_util.makeUrl(['season', season.id, 'edit']) %>">
+			<i class="icon fas fa-edit"></i>修改资料
+		</a>
+		<a class="ui  pink labeled icon button"
+			href="<%= web_util.makeUrl(['season', season.id, 'contest', 0, 'edit']) %>">
+			<i class="icon fas fa-plus"></i>新建比赛
+		</a>
+	<% } %>
+	<div class="ui two small statistics">
+		<div class="ui <%= seasonStatus(season.start_time, season.end_time) == 0 ? 'green' : (seasonStatus(season.start_time, season.end_time) == -1 ? 'grey' : 'red') %> statistic">
+			<div class="value">
+				<%= seasonStatus(season.start_time, season.end_time) == 0 ? '进行中' : (seasonStatus(season.start_time, season.end_time)==-1 ? '已结束' : '未开始' ) %>
+			</div>
+			<div class="label">
+				状态
+			</div>
 		</div>
-		<% } %>
+		<div class="ui statistic">
+			<div class="value req" id="contest_num">N/A</div>
+			<div class="label">
+				比赛数
+			</div>
+		</div>
+	</div>
 </div>
 <h4 class="ui top attached block header"><i class="fad fa-info-circle status pending"></i>公告</h4>
 <div class="ui bottom attached segment" id="season_content">
@@ -49,8 +65,6 @@
 		<div class="ui inverted disabled dimmer" id="rankingLoader">
 			<div class="ui text pink loader">正在拉取排名...</div>
 		</div>
-		<p></p>
-		<p></p>
 		<table class="ui very basic center aligned unstackable table">
 			<thead>
 				<tr>

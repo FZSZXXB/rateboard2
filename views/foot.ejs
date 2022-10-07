@@ -24,6 +24,12 @@
 </div>
 </div>
 <script type="text/javascript">
+Map.prototype.forEachAsync = async function (fn) {
+  return Promise.all(this.forEach(fn));
+};
+Array.prototype.forEachAsync = async function (fn) {
+  return Promise.all(this.map(fn));
+};
 function getSeasonId() {
 	let str = window.location.pathname.split('/').filter(x => x);
 	if (str.length > 2)
@@ -55,7 +61,11 @@ function getDetailCla(id) {
 			default: break;
 		}
 	}
-	$('#infoContent').html(`<div class="ui four statistics">
+	$('#infoContent').html(`
+	<div class="ui inverted disabled dimmer" id="infoLoader">
+			<div class="ui text pink loader">正在加载...</div>
+		</div>
+<div class="ui four statistics">
 	<div class="statistic">
     <div class="value req">
       ${rankTotal}
@@ -91,15 +101,35 @@ function getDetailCla(id) {
 </div>
 <h2>详细信息</h2><blockquote id="statistic_info"></blockquote>`)
 
-	for (let a of str) {
-		let cid = a.split('#')[0], rank = a.split('#')[1];
-		fetch(`/sport/queryContest/${cid}`)
-			.then(response => response.json())
-			.then(data => {
-				$("#statistic_info").append(`<p>${getGradeName(data.grade) + getTypeName(data.type) + data.title}第 ${rank} 名。</p>`);
-			})
-	}
+	let map = new Map();
+	$('#infoLoader').addClass('active');
+	$('#infoLoader').removeClass('disabled');
+	(async function() {
+		await str.forEachAsync(async a =>  {
 
+			let cid = a.split('#')[0], rank = a.split('#')[1];
+			
+				let res = await fetch(`/sport/queryContest/${cid}`);
+				let data = await res.json();
+				let formalTitle = getGradeName(data.grade) + getTypeName(data.type) + data.title;
+				let tmp = map.get(formalTitle);
+				if (tmp) {
+					map.set(formalTitle, tmp + '、' + rank);
+				} else {
+					map.set(formalTitle, rank);
+				}
+			
+		})
+		try {
+			await map.forEachAsync((value, key) => {
+				console.log(value, key)
+				$("#statistic_info").append(`<p>${key}第 ${value} 名。</p>`);
+			})
+
+		} catch (e) {}
+		$('#infoLoader').removeClass('active');
+		$('#infoLoader').addClass('disabled');
+	}) ();
 }
 function getDetailStu(id) {
 	$('#infoModal').modal('show');
@@ -117,7 +147,10 @@ function getDetailStu(id) {
 			default: break;
 		}
 	}
-	$('#infoContent').html(`<div class="ui four statistics">
+	$('#infoContent').html(`
+	<div class="ui inverted disabled dimmer" id="infoLoader">
+			<div class="ui text pink loader">正在加载...</div>
+		</div><div class="ui four statistics">
 	<div class="statistic">
     <div class="value req">
       ${rankTotal}
@@ -153,14 +186,36 @@ function getDetailStu(id) {
 </div>
 <h2>详细信息</h2><blockquote id="statistic_info"></blockquote>`)
 
-	for (let a of str) {
-		let cid = a.split('#')[0], rank = a.split('#')[1];
-		fetch(`/sport/queryContest/${cid}`)
-			.then(response => response.json())
-			.then(data => {
-				$("#statistic_info").append(`<p>${getGradeName(data.grade) + getTypeName(data.type) + data.title}第 ${rank} 名。</p>`);
+let map = new Map();
+	$('#infoLoader').addClass('active');
+	$('#infoLoader').removeClass('disabled');
+	(async function() {
+		await str.forEachAsync(async a =>  {
+
+			let cid = a.split('#')[0], rank = a.split('#')[1];
+			
+				let res = await fetch(`/sport/queryContest/${cid}`);
+				let data = await res.json();
+				let formalTitle = getGradeName(data.grade) + getTypeName(data.type) + data.title;
+				let tmp = map.get(formalTitle);
+				if (tmp) {
+					map.set(formalTitle, tmp + '、' + rank);
+				} else {
+					map.set(formalTitle, rank);
+				}
+			
+		})
+		try {
+			await map.forEachAsync((value, key) => {
+				console.log(value, key)
+				$("#statistic_info").append(`<p>${key}第 ${value} 名。</p>`);
 			})
-	}
+
+		} catch (e) {}
+		$('#infoLoader').removeClass('active');
+		$('#infoLoader').addClass('disabled');
+	}) ();
+		
 
 }
 function copyText(text) {
@@ -215,6 +270,8 @@ function fetchContest() {
 		.then(response => response.json())
 		.then(data => {
 			$('#season_content').html(marked.parse(data.content));
+			hljs.highlightAll();
+			$('#contest_num').html(data.contests.length);
 			localStorage.setItem(`season${getSeasonId()}_content`, data.content);
 			localStorage.setItem(`season${getSeasonId()}_contests`, JSON.stringify(data.contests));
 			let contests = data.contests;
@@ -284,13 +341,17 @@ function fetchSearch() {
 		})
 }
 $(document).ready(function () {
+	hljs.highlightAll();
 	let str = $('#titleVal').val();
 	console.log(str);
 	$('title').text(`${str} - 成绩表 2.0`);
 	if (getSeasonId()) {
 		fetchContest(); fetchSearch();
 		
-		setInterval(function () {
+		let readyInterval = setInterval(function () {
+			if (!getSeasonId()) {
+				clearInterval(readyInterval);
+			}
 			if (localStorage.getItem("last_fetch_time") != null) {
 				let ls = new Date(localStorage.getItem("last_fetch_time"));
 				if ((new Date()) - ls <= 10000) return;
@@ -311,7 +372,8 @@ $('#mainUiContainer').bind('pjax:end', function () {
 	NProgress.done();
 	$('.ui.mobile.sidebar').sidebar('hide');
 	let str = $('#titleVal').val();
-	console.log(str);
+	// console.log(str);
+	hljs.highlightAll();
 	$('title').text(`${str} - 成绩表 2.0`);
 	let sid = getSeasonId();
 	if (sid) {
@@ -323,8 +385,10 @@ $('#mainUiContainer').bind('pjax:end', function () {
 		}
 		if (getSeasonId()) {
 			fetchContest(); fetchSearch();
-
-			setInterval(function () {
+			let pjaxInterval = setInterval(function () {
+				if (!getSeasonId()) {
+					clearInterval(pjaxInterval);
+				}
 				if (localStorage.getItem("last_fetch_time") != null) {
 					let ls = new Date(localStorage.getItem("last_fetch_time"));
 					if ((new Date()) - ls <= 10000) return;
